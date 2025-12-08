@@ -1,8 +1,29 @@
 # WMR SMC Project – TurtleBot3 + ROS2 + NSMC / BSMC
+
 This project implements and compares two control laws for a differential wheeled mobile robot (WMR – Wheeled Mobile Robot):
 
 - **NSMC** – Novel Sliding Mode Controller  
 - **BSMC** – Backstepping Sliding Mode Controller  
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Mathematical Problem Description](#mathematical-problem-description)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [How to Run](#how-to-run)
+- [How to Run on a Real TurtleBot3 (Real-Time Experiments)](#how-to-run-on-a-real-turtlebot3-real-time-experiments)
+- [Controller Parameters](#controller-parameters)
+- [MATLAB Reference Implementation](#matlab-reference-implementation)
+- [Documentation](#documentation)
+- [Supported Trajectories](#supported-trajectories)
+- [Differences Between NSMC and BSMC](#differences-between-nsmc-and-bsmc)
+- [Results](#results)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+- [Contributing](#contributing)
+- [Contact & Support](#contact--support)
 
 ## Introduction
 
@@ -55,13 +76,14 @@ The controller must ensure tracking performance under:
 - Actuation limits (TurtleBot3 velocity bounds)
 
 ### Nonlinear Robust Control Formulation
+
 The paper implements a nonlinear robust control law (backstepping, sliding mode, or error feedback linearization depending on the exact formulation), using:
 
-- Error Transformation to Local Frame:
+**Error Transformation to Local Frame:**
 
-$$\begin{bmatrix} e_x \\ e_y \end{bmatrix} = \begin{bmatrix} \cos\theta & \sin\theta \\\ -\sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} x_r - x \\\ y_r - y \end{bmatrix}$$
+$$\begin{bmatrix} e_x \\ e_y \end{bmatrix} = \begin{bmatrix} \cos\theta & \sin\theta \\ -\sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} x_r - x \\ y_r - y \end{bmatrix}$$
 
-- Lyapunov Stability Condition:
+**Lyapunov Stability Condition:**
 
 A Lyapunov function $V(e)$ is constructed such that:
 
@@ -79,12 +101,13 @@ The controller is first validated in MATLAB by simulating:
 
 - the nonlinear robot dynamics
 - circular and 8-shape trajectories
-- external bounded disturbances.
+- external bounded disturbances
 
 It is then deployed on a TurtleBot3 using ROS 2, receiving localization data from `/odom` and sending velocity commands to `/cmd_vel`.
 
 ---
-## **Project Structure**
+
+## Project Structure
 
 ```text
 wmr_smc_project/
@@ -98,6 +121,7 @@ wmr_smc_project/
 ├── matlab/
 │   ├── wmr_smc.m                    # reference MATLAB code
 │   ├── figures/                     # MATLAB trajectories and plots
+│   ├── run_wmr_smc.sh               # script to run MATLAB simulation
 │   └── notes/                       # theoretical notes SMC / BSMC
 │
 ├── docs/
@@ -116,148 +140,154 @@ wmr_smc_project/
 └── LICENSE
 ```
 
-
 ## Prerequisites
 
 - Ubuntu 22.04 (Jammy)
-
 - ROS2 Humble installed (`/opt/ros/humble`)
+- TurtleBot3 packages for ROS2
+- Octave or MATLAB (for running MATLAB simulations)
 
-- TurtleBot3 for ROS2:
+### Install ROS2 Dependencies
 
 ```bash
 sudo apt install -y ros-humble-turtlebot3 ros-humble-turtlebot3-simulations \
-ros-humble-gazebo-ros-pkgs
+ros-humble-gazebo-ros-pkgs python3-colcon-common-extensions
 ```
 
-**colcon** and **python3-colcon-common-extensions**
+### Install Octave (for MATLAB simulations)
 
-RViz2 and Gazebo installed with ROS2
+```bash
+sudo apt install -y octave
+```
 
 ## Installation
 
+### 1. Clone the Repository
+
 ```bash
-# Clone the repo
 git clone https://github.com/thoukam/wmr_smc_project.git
-cd wmr_smc_project/ros2_ws
+cd wmr_smc_project
 ```
+
+### 2. Get TurtleBot3 Packages
 
 This project depends on two official TurtleBot3 packages for ROS 2 Humble:
 
-- turtlebot3
+- `turtlebot3`
+- `turtlebot3_simulations`
 
-- turtlebot3_simulations
+**Option 1 — Install from system (recommended):**
 
-These packages must exist inside the workspace:
+The packages are automatically available after installing `ros-humble-turtlebot3` and `ros-humble-turtlebot3-simulations`.
 
-```text
-ros2_ws/src/
-    ├── turtlebot3/
-    ├── turtlebot3_simulations/
-    ├── wmr_controller/
-    └── ...
-```
+**Option 2 — Clone the official repositories (alternative):**
 
-They are required for:
-
-the TurtleBot3 URDF description
-
-Gazebo Classic simulation (turtlebot3_gazebo)
-
-fake sensors / dynamics simulation
-
-running the controller on real or simulated robots
-
-⚠️ Important
-
-These packages are NOT included inside the Git repository (because they are large and system-managed).
-You must install or place them manually inside ros2_ws/src before building the workspace.
-
-You have two options:
-
-##### Option 1 — Install from system (recommended)
-
-Install the official prebuilt ROS 2 Humble packages:
-
-sudo apt install -y ros-humble-turtlebot3 ros-humble-turtlebot3-simulations
-
-
-Then link them automatically when sourcing /opt/ros/humble/setup.bash.
-No need to clone anything manually.
-
-##### Option 2 — Clone the official repositories (alternative)
-
-If you prefer to compile them yourself:
 ```bash
 cd ros2_ws/src
 git clone -b humble-devel https://github.com/ROBOTIS-GIT/turtlebot3.git
 git clone -b humble-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+cd ..
 ```
-After installing the packages, rebuild:
+
+### 3. Build the Workspace
 
 ```bash
-# Build the workspace
+cd ros2_ws
 source /opt/ros/humble/setup.bash
 colcon build --symlink-install
+```
 
-# Sourcing (add to your ~/.bashrc if you want)
+### 4. Setup Environment (Optional)
+
+Add to your `~/.bashrc`:
+
+```bash
 source /opt/ros/humble/setup.bash
 source ~/wmr_smc_project/ros2_ws/install/setup.bash
 ```
 
-## How to Run the Full Simulation
-- Terminal 1 – Launch Gazebo with TurtleBot3
+Then reload your shell:
+```bash
+source ~/.bashrc
+```
+
+---
+
+## How to Run
+
+### MATLAB Reference Model
+
+Run the MATLAB simulation directly:
+
+```bash
+cd ~/wmr_smc_project/matlab
+./run_wmr_smc.sh
+```
+
+Or manually:
+
+```bash
+QT_QPA_PLATFORM=offscreen octave wmr_smc.m
+```
+
+This generates plots and saves them to `matlab/figures/`.
+
+### Full ROS2 Simulation
+
+**Terminal 1 – Launch Gazebo with TurtleBot3:**
+
 ```bash
 cd ~/wmr_smc_project
 ./scripts/run_tb3_sim.sh
 ```
 
-This starts:
+This starts Gazebo with TurtleBot3 Burger in an empty world.
 
-Gazebo
+**Terminal 2 – Launch the NSMC/BSMC Controller:**
 
-TurtleBot3 Burger
-
-Empty simulation world
-
-- Terminal 2 – Launch the NSMC/BSMC controller
 ```bash
 cd ~/wmr_smc_project
+source ros2_ws/install/setup.bash
 ./scripts/run_wmr_controller.sh
-
-//
-
-./scripts/run_wmr_controller.sh BSMC circle
-
 ```
+
+Or with custom parameters:
+
+```bash
+./scripts/run_wmr_controller.sh NSMC circle
+```
+
 You should see real-time logs showing the controller behavior.
 
-- Terminal 3 – Start RViz2 visualization
+**Terminal 3 – Start RViz2 Visualization:**
+
 ```bash
 cd ~/wmr_smc_project
+source ros2_ws/install/setup.bash
 ./scripts/view_rviz.sh
 ```
 
-**RViz displays**:
+**RViz displays:**
+- Reference trajectory (`/wmr/ref_path`)
+- Robot trajectory (`/wmr/robot_path`)
 
-- Reference trajectory (/wmr/ref_path)
+---
 
-- Robot trajectory (/wmr/robot_path)
-
-### Controller Parameters
+## Controller Parameters
 
 The controller node exposes several ROS2 parameters:
 
-Parameter	Meaning
-- controller_type	"NSMC" or "BSMC"
-- trajectory	"circle" or "figure8"
-- R	Trajectory radius (m)
-- Omega	Angular frequency (rad/s)
-- Vmax	Linear speed saturation (m/s)
-- Wmax	Angular speed saturation (rad/s)
-- use_disturbance	Apply disturbance to test robustness (true/false)
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `controller_type` | string | "NSMC" | "NSMC" or "BSMC" |
+| `trajectory` | string | "circle" | "circle" or "figure8" |
+| `R` | double | 1.5 | Trajectory radius (m) |
+| `Omega` | double | 0.25 | Angular frequency (rad/s) |
+| `Vmax` | double | 1.5 | Linear speed saturation (m/s) |
+| `Wmax` | double | 1.5 | Angular speed saturation (rad/s) |
+| `use_disturbance` | bool | true | Apply disturbance to test robustness |
 
-Example custom execution:
+**Example custom execution:**
 
 ```bash
 ros2 run wmr_controller wmr_controller \
@@ -271,95 +301,320 @@ ros2 run wmr_controller wmr_controller \
     -p use_disturbance:=true
 ```
 
-MATLAB Reference Model
+---
 
-matlab/wmr_smc.m contains:
+## MATLAB Reference Implementation
 
-A full mathematical implementation of NSMC and BSMC
+`matlab/wmr_smc.m` contains:
 
-Exact kinematic WMR model
+- Full mathematical implementation of NSMC and BSMC
+- Exact kinematic WMR model
+- Circular and lemniscate reference trajectories
+- Plots for:
+  - Tracking errors
+  - Control inputs
+  - Robot vs reference trajectory
 
-Circular and lemniscate reference trajectories
+This serves as ground truth to validate the ROS2 controller.
 
-Plots for:
-
-tracking errors
-
-control inputs
-
-robot vs reference trajectory
-
-This serves as a ground truth to validate the ROS controller.
+---
 
 ## Documentation
 
-The documentation in /docs explains the entire project:
+The documentation in `/docs` explains the entire project:
 
-- control_theory.md
+**control_theory.md:**
+- Sliding Mode Control basics
+- NSMC surfaces and design
+- BSMC derivation
+- Stability considerations
 
-Sliding Mode Control basics
+**architecture.md:**
+- ROS2 nodes and topics
+- Data flow diagram
 
-NSMC surfaces and design
+**tuning_guide.md:**
+- How to tune controller gains for different scenarios
+- Recommended gain values
 
-BSMC derivation
+---
 
-Stability considerations
+## Supported Trajectories
 
-- **architecture.md**
-
-ROS2 nodes /odom, /cmd_vel, /wmr/ref_path, /wmr/robot_path
-
-Diagram of data flow
-
-
-Supported Trajectories
-✔ Circle
-
+### ✔ Circle
 Perfect for stable trajectory tracking tests.
 
-✔ Figure-8 (Lemniscate of Gerono)
-
+### ✔ Figure-8 (Lemniscate of Gerono)
 More challenging, validates nonlinear behavior and robustness.
 
+---
 
-# Differences Between NSMC and BSMC
+## Differences Between NSMC and BSMC
 
-During our simulations, we observed several practical differences between the two controllers:
+| Aspect | NSMC | BSMC |
+|--------|------|------|
+| **Convergence Speed** | Fast, aggressive | Slower, gradual |
+| **Control Smoothness** | Potentially oscillatory | Very smooth |
+| **Tracking Accuracy** | Higher on curves | Good, slightly lower |
+| **Noise Sensitivity** | More sensitive | Robust to noise |
+| **Disturbance Handling** | Excellent for strong | Good for moderate |
+| **Real Robot Suitability** | Requires careful tuning | Better for real systems |
 
-- NSMC converges faster and corrects errors more aggressively.
+**Summary:**
+- **NSMC** is more reactive and precise, but requires careful gain tuning
+- **BSMC** is smoother and more robust, better for real robots
 
-- BSMC produces smoother control signals and is less sensitive to noise.
+---
 
-- NSMC achieves higher tracking accuracy, especially on curved trajectories.
+## Results
 
-- BSMC is more stable for real robots because the control effort is lower.
+### MATLAB Simulations
 
-- NSMC handles strong disturbances better but may oscillate if gains are too high.
+#### NSMC
+- Figure-8: ![NSMC Figure8](matlab/figures/trajectoire_figure8_NSMC.png)
+- Circle: ![NSMC Circle](matlab/figures/trajectoire_circle_NSMC.png)
 
-- BSMC handles moderate disturbances well while maintaining smooth motion.
+#### BSMC
+- Figure-8: ![BSMC Figure8](matlab/figures/trajectoire_figure8_BSMC.png)
+- Circle: ![BSMC Circle](matlab/figures/trajectoire_circle_BSMC.png)
 
-In summary:
-NSMC is more reactive and precise, while BSMC is smoother and more robust to measurement noise.
+### ROS2 Gazebo Simulation
 
+#### NSMC
+- Circle: ![NSMC Circle ROS2](Ros2_results/NSMC_circle.png)
+- Lemniscate: ![NSMC Lemniscate ROS2](Ros2_results/NSMC_lemniscate.png)
 
-# results with matlab
+#### BSMC
+- Circle: ![BSMC Circle ROS2](Ros2_results/BSMC_circle.png)
+- Lemniscate: ![BSMC Lemniscate ROS2](Ros2_results/BSMC_lemniscate.png)
 
-## NSMC
+### Real TurtleBot3 Results
 
-![Description](matlab/figures/trajectoire_figure8_NSMC.png)  ![Description](matlab/figures/trajectoire_circle_NSMC.png)
+To be completed with real robot experiments...
 
-## BSMC
-![Description](matlab/figures/trajectoire_figure8_BSMC.png)   ![Description](matlab/figures/trajectoire_circle_BSMC.png)
+---
 
+## How to Run on a Real TurtleBot3 (Real-Time Experiments)
 
-# results with ROS2 simulation
+This project can run in Gazebo (simulation only on your PC) and on a real TurtleBot3 (Burger/Waffle). Below is a concise checklist to run the NSMC/BSMC controller on the physical robot.
 
-## NSMC
-![Description](Ros2_results/NSMC_circle.png)  ![Description](Ros2_results/NSMC_lemniscate.png)
+### 0. Assumptions & Prerequisites
+- TurtleBot3 (Burger recommended) with ROS 2 Humble installed on the SBC (Raspberry Pi or similar)
+- Existing TurtleBot3 workspace (`turtlebot3_ws`) already set up on the robot with `turtlebot3_bringup` and `turtlebot3_simulations`
+- Your laptop/PC and the robot are on the same network
+- ROS 2 Humble is installed on your laptop
 
-## BSMC
-![Description](Ros2_results/BSMC_circle.png)   ![Description](Ros2_results/BSMC_circle.png)
+### 1. Important Notes
 
+#### Simulation vs Real Robot
+- **Simulation (Gazebo/RViz):** Always runs on your PC, never on the robot (too resource-intensive)
+- **You do NOT need to be connected to a real robot to test simulations:** You can test locally on your PC
+- **Controller node:** Runs on either the robot (real-time control) or your PC (simulation)
+- **Visualization (RViz):** Always on your PC, even when running on real robot
 
-# Results from Real turtlebot3
+#### Two Deployment Options
 
+**Option A — Clone full project on robot (then simulate + real testing):**
+- Clone this entire repository on the robot
+- Clone `turtlebot3` and `turtlebot3_simulations` in the same workspace
+- More complete, but takes more space on SBC
+
+**Option B — Copy only wmr_controller to robot (RECOMMENDED for real robot):**
+- The robot already has `turtlebot3_ws` with TurtleBot3 packages
+- Copy only the `wmr_controller` package into the robot's existing workspace
+- More efficient for real-time operation
+- Recommended approach for production use
+
+### 2. Deploy wmr_controller to Robot (Option B – Recommended)
+
+#### Step A: Copy wmr_controller package via SSH
+From your laptop, copy the controller to the robot's workspace:
+```bash
+# Copy wmr_controller folder to robot's turtlebot3_ws
+scp -r ~/wmr_smc_project/ros2_ws/src/wmr_controller ubuntu@<turtlebot-ip>:~/turtlebot3_ws/src/
+```
+
+#### Step B: Build on the robot
+SSH into the turtlebot and build:
+```bash
+ssh ubuntu@<turtlebot-ip>
+cd ~/turtlebot3_ws
+colcon build --symlink-install
+source install/setup.bash
+```
+
+### 3. Network & Environment Setup (Robot + Laptop)
+
+On **both machines** set the same ROS_DOMAIN_ID (example: `30`) and allow network:
+```bash
+export ROS_DOMAIN_ID=30
+export ROS_LOCALHOST_ONLY=0
+source /opt/ros/humble/setup.bash
+```
+
+On your **laptop** also source the workspace:
+```bash
+cd ~/wmr_smc_project/ros2_ws
+source install/setup.bash
+```
+
+On the **turtlebot** source its workspace:
+```bash
+cd ~/turtlebot3_ws
+source install/setup.bash
+```
+
+### 4. Start TurtleBot3 Bringup (on the Robot)
+SSH into the turtlebot and start the hardware layer:
+```bash
+ssh ubuntu@<robot-ip>
+export ROS_DOMAIN_ID=30
+export ROS_LOCALHOST_ONLY=0
+export TURTLEBOT3_MODEL=burger
+source /opt/ros/humble/setup.bash
+source ~/turtlebot3_ws/install/setup.bash
+ros2 launch turtlebot3_bringup robot.launch.py
+```
+
+This starts:
+- Motor driver (subscribes to `/cmd_vel`)
+- Odometry sensor (`/odom` publisher)
+- TF transforms
+
+From your laptop, verify connectivity:
+```bash
+ros2 topic list | grep -E "(cmd_vel|odom)"
+```
+
+### 5. Run the WMR Controller (on the Robot)
+In a new SSH terminal to the robot, launch the controller with conservative parameters:
+```bash
+ssh ubuntu@<robot-ip>
+export ROS_DOMAIN_ID=30
+export ROS_LOCALHOST_ONLY=0
+source /opt/ros/humble/setup.bash
+source ~/turtlebot3_ws/install/setup.bash
+
+ros2 run wmr_controller wmr_controller \
+  --ros-args \
+    -p controller_type:=NSMC \
+    -p trajectory:=circle \
+    -p R:=0.4 \
+    -p Omega:=0.15 \
+    -p Vmax:=0.15 \
+    -p Wmax:=1.0 \
+    -p use_disturbance:=false
+```
+
+The controller node will:
+- Subscribe to `/odom` (robot odometry from Raspberry Pi)
+- Compute reference trajectory in the `odom` frame
+- Publish control commands to `/cmd_vel` (motors)
+- Publish `/wmr/ref_path` and `/wmr/robot_path` for visualization
+
+### 6. Visualize on Your Laptop (Optional)
+On your laptop only (NOT on the robot):
+```bash
+cd ~/wmr_smc_project/ros2_ws
+source install/setup.bash
+rviz2
+```
+
+You will see:
+- Reference path (`/wmr/ref_path`)
+- Actual robot path (`/wmr/robot_path`)
+- TF frames
+- Real-time robot position from `/odom`
+
+### 7. Safety Tips
+- Start with small radius and low speeds: `R ∈ [0.3, 0.5]` m, `Vmax ∈ [0.10, 0.18]` m/s, `Wmax ∈ [0.8, 1.2]` rad/s
+- Ensure a clear, open area (at least 2m × 2m) and have an emergency stop ready
+- Test in simulation first (Gazebo on your PC) before running on the real robot
+- Monitor logs in real-time for any errors or warnings
+- If the robot deviates significantly, press **Ctrl+C** immediately on the robot terminal
+- If motion is unstable: stop (`Ctrl+C`), reduce gains (`a11,a12,a21,a22,k1,k2`) and lower `Vmax`/`Wmax`.
+
+### 7. Test with disturbances (optional)
+To enable simulated disturbances on the real robot (for robustness tests):
+```bash
+ros2 run wmr_controller wmr_controller \
+  --ros-args \
+    -p controller_type:=NSMC \
+    -p trajectory:=circle \
+    -p R:=0.4 \
+    -p Omega:=0.15 \
+    -p Vmax:=0.15 \
+    -p Wmax:=1.0 \
+    -p use_disturbance:=true
+```
+---
+
+## Troubleshooting
+
+### Octave not found
+```bash
+sudo apt install -y octave
+```
+
+### Octave crashes with graphics error
+Use the offscreen backend:
+```bash
+QT_QPA_PLATFORM=offscreen octave wmr_smc.m
+```
+
+### ROS2 workspace not sourced
+```bash
+source /opt/ros/humble/setup.bash
+source ~/wmr_smc_project/ros2_ws/install/setup.bash
+```
+
+### TurtleBot3 packages not found
+```bash
+sudo apt install -y ros-humble-turtlebot3 ros-humble-turtlebot3-simulations
+```
+
+Or manually clone:
+```bash
+cd ros2_ws/src
+git clone -b humble-devel https://github.com/ROBOTIS-GIT/turtlebot3.git
+git clone -b humble-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+cd .. && colcon build
+```
+
+### Gazebo/RViz doesn't start
+1. Install missing packages:
+   ```bash
+   sudo apt install -y ros-humble-gazebo-ros-pkgs ros-humble-rviz2
+   ```
+
+2. Source environment:
+   ```bash
+   source /opt/ros/humble/setup.bash
+   ```
+
+---
+
+## License
+
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## Contact & Support
+
+For questions or issues, please open a GitHub Issue.
+
+**Author:** Yves Thoukam && Jeol Therence 
+**Repository:** [wmr_smc_project](https://github.com/thoukam/wmr_smc_project)
