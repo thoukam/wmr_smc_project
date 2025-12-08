@@ -138,9 +138,64 @@ RViz2 and Gazebo installed with ROS2
 
 ```bash
 # Clone the repo
-git clone https://github.com/<your-user>/wmr_smc_project.git
+git clone https://github.com/thoukam/wmr-robust-smc-controller.git
 cd wmr_smc_project/ros2_ws
+```
 
+This project depends on two official TurtleBot3 packages for ROS 2 Humble:
+
+- turtlebot3
+
+- turtlebot3_simulations
+
+These packages must exist inside the workspace:
+
+
+ros2_ws/src/
+    ├── turtlebot3/
+    ├── turtlebot3_simulations/
+    ├── wmr_controller/
+    └── ...
+
+
+They are required for:
+
+the TurtleBot3 URDF description
+
+Gazebo Classic simulation (turtlebot3_gazebo)
+
+fake sensors / dynamics simulation
+
+running the controller on real or simulated robots
+
+⚠️ Important
+
+These packages are NOT included inside the Git repository (because they are large and system-managed).
+You must install or place them manually inside ros2_ws/src before building the workspace.
+
+You have two options:
+
+##### Option 1 — Install from system (recommended)
+
+Install the official prebuilt ROS 2 Humble packages:
+
+sudo apt install -y ros-humble-turtlebot3 ros-humble-turtlebot3-simulations
+
+
+Then link them automatically when sourcing /opt/ros/humble/setup.bash.
+No need to clone anything manually.
+
+##### Option 2 — Clone the official repositories (alternative)
+
+If you prefer to compile them yourself:
+```bash
+cd ros2_ws/src
+git clone -b humble-devel https://github.com/ROBOTIS-GIT/turtlebot3.git
+git clone -b humble-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+```
+After installing the packages, rebuild:
+
+```bash
 # Build the workspace
 source /opt/ros/humble/setup.bash
 colcon build --symlink-install
@@ -149,7 +204,6 @@ colcon build --symlink-install
 source /opt/ros/humble/setup.bash
 source ~/wmr_smc_project/ros2_ws/install/setup.bash
 ```
-
 
 ## How to Run the Full Simulation
 - Terminal 1 – Launch Gazebo with TurtleBot3
