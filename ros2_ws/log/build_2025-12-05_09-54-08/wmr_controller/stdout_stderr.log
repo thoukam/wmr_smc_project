@@ -1,0 +1,22 @@
+running develop
+running egg_info
+creating wmr_controller.egg-info
+writing wmr_controller.egg-info/PKG-INFO
+writing dependency_links to wmr_controller.egg-info/dependency_links.txt
+writing entry points to wmr_controller.egg-info/entry_points.txt
+writing requirements to wmr_controller.egg-info/requires.txt
+writing top-level names to wmr_controller.egg-info/top_level.txt
+writing manifest file 'wmr_controller.egg-info/SOURCES.txt'
+reading manifest file 'wmr_controller.egg-info/SOURCES.txt'
+writing manifest file 'wmr_controller.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/roboticslab/wmr_smc_project/ros2_ws/install/wmr_controller/lib/python3.10/site-packages/wmr-controller.egg-link (link to .)
+Installing wmr_controller script to /home/roboticslab/wmr_smc_project/ros2_ws/install/wmr_controller/lib/wmr_controller
+
+Installed /home/roboticslab/wmr_smc_project/ros2_ws/build/wmr_controller
+running symlink_data
+creating /home/roboticslab/wmr_smc_project/ros2_ws/install/wmr_controller/share/ament_index
+creating /home/roboticslab/wmr_smc_project/ros2_ws/install/wmr_controller/share/ament_index/resource_index
+creating /home/roboticslab/wmr_smc_project/ros2_ws/install/wmr_controller/share/ament_index/resource_index/packages
+symbolically linking /home/roboticslab/wmr_smc_project/ros2_ws/build/wmr_controller/resource/wmr_controller -> /home/roboticslab/wmr_smc_project/ros2_ws/install/wmr_controller/share/ament_index/resource_index/packages
+symbolically linking /home/roboticslab/wmr_smc_project/ros2_ws/build/wmr_controller/package.xml -> /home/roboticslab/wmr_smc_project/ros2_ws/install/wmr_controller/share/wmr_controller

@@ -1,0 +1,13 @@
+package.xml
+setup.cfg
+setup.py
+resource/wmr_controller
+wmr_controller/__init__.py
+wmr_controller/wmr_controller_node.py
+wmr_controller.egg-info/PKG-INFO
+wmr_controller.egg-info/SOURCES.txt
+wmr_controller.egg-info/dependency_links.txt
+wmr_controller.egg-info/entry_points.txt
+wmr_controller.egg-info/requires.txt
+wmr_controller.egg-info/top_level.txt
+wmr_controller.egg-info/zip-safe

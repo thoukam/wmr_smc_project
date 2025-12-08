@@ -1,0 +1,3 @@
+[console_scripts]
+wmr_controller = wmr_controller.wmr_controller_node:main
+

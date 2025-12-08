@@ -1,0 +1,71 @@
+# RViz Configuration File Template for WMR Trajectory Tracking
+
+# --- Global Settings ---
+# Définit la trame fixe pour toutes les visualisations
+Global Options:
+  Background Color: 48; 48; 48
+  Fixed Frame: odom
+  
+# --- Visualization Manager ---
+# Liste des affichages configurés dans RViz
+Visualization Manager:
+  Class: ""
+  Displays:
+    # 1. Grille (pour référence spatiale)
+    - Class: rviz_default_plugins/Grid
+      Enabled: true
+      Cell Size: 1
+      Color: 160; 160; 160
+      Name: Grid
+      Plane: XY
+      Renderable: true
+      Line Style:
+        Line Width: 0.03
+    
+    # 2. Arbre de transformations (essentiel pour afficher les modèles)
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 2.0
+      Show Arrows: true
+      Show Names: false
+      Show True/False by default: false
+      Tree:
+        odom:
+          base_footprint:
+            base_link:
+              # ... toutes les transformations du robot
+    
+    # 3. Trajectoire de Référence (Référence idéale)
+    - Class: rviz_default_plugins/Path
+      Enabled: true
+      Color: 255; 255; 0  # Jaune (Référence)
+      Name: Reference Path (/wmr/ref_path)
+      Topic: /wmr/ref_path
+      Line Style:
+        Line Width: 0.05
+        Style: Lines
+      Buffer Length: 1000 # Nombre maximum de points à afficher
+      Queue Size: 10
+    
+    # 4. Trajectoire du Robot (Trajectoire réelle)
+    - Class: rviz_default_plugins/Path
+      Enabled: true
+      Color: 0; 0; 255  # Bleu (Robot)
+      Name: Robot Path (/wmr/robot_path)
+      Topic: /wmr/robot_path
+      Line Style:
+        Line Width: 0.05
+        Style: Lines
+      Buffer Length: 1000
+      Queue Size: 10
+      
+    # 5. Modèle du Robot (Afficher le TurtleBot3)
+    - Class: rviz_default_plugins/RobotModel
+      Enabled: true
+      Name: Robot Model
+      TF Prefix: "" # Laisse vide pour utiliser les noms de trames standard
+      Visual Enabled: true
+      Collision Enabled: false
+      Update Rate: 0.0
+
+  # ... autres paramètres de RViz ...
