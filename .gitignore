@@ -1,0 +1,14 @@
+# ROS 2 workspace build artifacts
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# Ignorer le repo turtlebot3_simulations (on le garde localement)
+ros2_ws/src/turtlebot3_simulations/
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Logs divers
+*.log
