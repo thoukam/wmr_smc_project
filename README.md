@@ -138,7 +138,7 @@ RViz2 and Gazebo installed with ROS2
 
 ```bash
 # Clone the repo
-git clone https://github.com/thoukam/wmr-robust-smc-controller.git
+git clone https://github.com/thoukam/wmr_smc_project.git
 cd wmr_smc_project/ros2_ws
 ```
 
@@ -150,13 +150,13 @@ This project depends on two official TurtleBot3 packages for ROS 2 Humble:
 
 These packages must exist inside the workspace:
 
-
+```text
 ros2_ws/src/
     ├── turtlebot3/
     ├── turtlebot3_simulations/
     ├── wmr_controller/
     └── ...
-
+```
 
 They are required for:
 
@@ -353,3 +353,13 @@ NSMC is more reactive and precise, while BSMC is smoother and more robust to mea
 
 
 # results with ROS2 simulation
+
+## NSMC
+![Description](Ros2_results/NSMC_circle.png)  ![Description](Ros2_results/NSMC_lemniscate.png)
+
+## BSMC
+![Description](Ros2_results/BSMC_circle.png)   ![Description](Ros2_results/BSMC_circle.png)
+
+
+# Results from Real turtlebot3
+
