@@ -390,8 +390,27 @@ More challenging, validates nonlinear behavior and robustness.
 
 ### Real TurtleBot3 Results
 
-To be completed with real robot experiments...
+Experimental validation on a real TurtleBot3 Burger robot demonstrates the effectiveness of both NSMC and BSMC controllers in real-world conditions.
 
+#### Video Demonstrations
+
+- **Full experiment playlist:** [Watch on Google Drive](https://drive.google.com/drive/folders/1AqdatpttKd4xT3uOgKL4xw1w8i_5uC5-?usp=sharing)
+  - NSMC circular trajectory tracking
+  - BSMC circular trajectory tracking
+  - Disturbance rejection tests
+  - Trajectory switching and robustness
+
+#### Quick Demo GIF
+
+![TurtleBot3 NSMC Circle Trajectory](Ros2_results/demo.gif)
+
+*Real robot executing circular trajectory with NSMC controller.*
+
+#### Key Observations
+- **NSMC:** Faster convergence, tighter tracking, but more motor activity
+- **BSMC:** Smoother motion, less aggressive control, better energy efficiency
+- Both controllers handle real-world odometry noise effectively
+- Disturbance rejection validated with manual perturbations
 ---
 
 ## How to Run on a Real TurtleBot3 (Real-Time Experiments)
