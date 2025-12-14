@@ -1,5 +1,7 @@
 # WMR SMC Project – TurtleBot3 + ROS2 + NSMC / BSMC
 
+![](Ros2_results/wmr_smc_poster_1.png)
+
 This project implements and compares two control laws for a differential wheeled mobile robot (WMR – Wheeled Mobile Robot):
 
 - **NSMC** – Novel Sliding Mode Controller  
