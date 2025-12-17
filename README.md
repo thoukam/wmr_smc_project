@@ -57,7 +57,8 @@ This nonlinear model couples translation and orientation, making trajectory trac
 
 The objective is to track a time-varying reference trajectory:
 
-$$q_r(t) = \begin{bmatrix} x_r(t) \\ y_r(t) \\ \theta_r(t) \end{bmatrix}$$
+$q_r(t) = \begin{bmatrix} x_r(t) \\ y_r(t) \\ \theta_r(t) \end{bmatrix}$
+
 by designing control inputs $v(t)$ and $\omega(t)$ such that the tracking error:
 
 $$e(t) = q_r(t) - q(t)$$
