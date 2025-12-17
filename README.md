@@ -58,7 +58,6 @@ This nonlinear model couples translation and orientation, making trajectory trac
 The objective is to track a time-varying reference trajectory:
 
 $$q_r(t) = \begin{bmatrix} x_r(t) \\ y_r(t) \\ \theta_r(t) \end{bmatrix}$$
-
 by designing control inputs $v(t)$ and $\omega(t)$ such that the tracking error:
 
 $$e(t) = q_r(t) - q(t)$$
@@ -84,6 +83,7 @@ The paper implements a nonlinear robust control law (backstepping, sliding mode,
 **Error Transformation to Local Frame:**
 
 $$\begin{bmatrix} e_x \\ e_y \end{bmatrix} = \begin{bmatrix} \cos\theta & \sin\theta \\ -\sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} x_r - x \\ y_r - y \end{bmatrix}$$
+
 
 **Lyapunov Stability Condition:**
 
