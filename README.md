@@ -83,8 +83,11 @@ The paper implements a nonlinear robust control law (backstepping, sliding mode,
 
 **Error Transformation to Local Frame:**
 
-$$\begin{bmatrix} e_x \\ e_y \end{bmatrix} = \begin{bmatrix} \cos\theta & \sin\theta \\ -\sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} x_r - x \\ y_r - y \end{bmatrix}$$
+[e_x, e_y]ᵀ = R(θ) · [x_r − x, y_r − y]ᵀ
 
+with  
+R(θ) = [[ cosθ,  sinθ],
+        [−sinθ,  cosθ]]
 
 **Lyapunov Stability Condition:**
 
